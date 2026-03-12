@@ -1,0 +1,9 @@
+node_modules
+dist
+*.log
+.git
+.env
+docs
+scripts
+*.plist
+deploy.sh

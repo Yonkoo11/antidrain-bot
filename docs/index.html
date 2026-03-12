@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Antidrain - Solana Token Rescue</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --surface2: #1a1a25;
+      --border: #2a2a3a;
+      --text: #e0e0e8;
+      --text2: #8888a0;
+      --accent: #f5a623;
+      --accent2: #e8941a;
+      --success: #22c55e;
+      --error: #ef4444;
+      --warning: #f59e0b;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      border-bottom: 1px solid var(--border);
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 22px;
+      font-weight: 700;
+    }
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .nav-links { display: flex; gap: 20px; }
+    .nav-links a {
+      color: var(--text2);
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    /* Steps */
+    .steps {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      padding: 30px 40px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .step {
+      flex: 1;
+      text-align: center;
+      padding: 12px 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text2);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .step:first-child { border-radius: 8px 0 0 8px; }
+    .step:last-child { border-radius: 0 8px 8px 0; }
+    .step.active {
+      background: var(--accent);
+      color: #000;
+      border-color: var(--accent);
+    }
+    .step-num {
+      display: inline-block;
+      width: 22px;
+      height: 22px;
+      line-height: 22px;
+      border-radius: 50%;
+      background: var(--surface2);
+      color: var(--text2);
+      font-size: 12px;
+      margin-right: 6px;
+    }
+    .step.active .step-num {
+      background: rgba(0,0,0,0.2);
+      color: #000;
+    }
+
+    /* Main content */
+    .main {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 0 40px 60px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 20px;
+    }
+    .card-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .card-subtitle {
+      color: var(--text2);
+      font-size: 13px;
+      margin-bottom: 24px;
+    }
+
+    /* Form elements */
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text2);
+      margin-bottom: 6px;
+    }
+    input, select {
+      width: 100%;
+      padding: 12px 14px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: monospace;
+      margin-bottom: 16px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus, select:focus { border-color: var(--accent); }
+    input::placeholder { color: var(--text2); opacity: 0.5; }
+
+    /* Buttons */
+    .btn-row { display: flex; gap: 12px; margin-top: 8px; }
+    .btn {
+      flex: 1;
+      padding: 14px 20px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+      border-color: var(--accent);
+    }
+    .btn-primary:hover { background: var(--accent2); }
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .btn-secondary {
+      background: var(--surface2);
+      color: var(--text);
+    }
+    .btn-secondary:hover { background: var(--border); }
+
+    /* Sweep mode tabs */
+    .mode-tabs { display: flex; gap: 0; margin-bottom: 16px; }
+    .mode-tab {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text2);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .mode-tab:first-child { border-radius: 8px 0 0 8px; }
+    .mode-tab:last-child { border-radius: 0 8px 8px 0; }
+    .mode-tab.active {
+      background: var(--accent);
+      color: #000;
+      border-color: var(--accent);
+    }
+
+    /* Console */
+    .console {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 20px;
+      max-height: 300px;
+      overflow-y: auto;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+    .console-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-red { background: #ff5f57; }
+    .dot-yellow { background: #febc2e; }
+    .dot-green { background: #28c840; }
+    .log-info { color: var(--text2); }
+    .log-success { color: var(--success); }
+    .log-error { color: var(--error); }
+    .log-warn { color: var(--warning); }
+
+    /* Token list */
+    .token-list { margin-top: 16px; }
+    .token-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-bottom: 6px;
+      font-size: 13px;
+    }
+    .token-mint {
+      font-family: monospace;
+      color: var(--text2);
+      font-size: 11px;
+    }
+    .token-amount { font-weight: 600; }
+    .token-status {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+    .status-ready { background: rgba(34,197,94,0.15); color: var(--success); }
+    .status-frozen { background: rgba(239,68,68,0.15); color: var(--error); }
+    .status-swept { background: rgba(245,166,35,0.15); color: var(--accent); }
+
+    /* Network selector */
+    .network-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(245,166,35,0.15);
+      color: var(--accent);
+    }
+
+    /* Sponsor balance */
+    .balance-display {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+    .balance-amount {
+      font-size: 20px;
+      font-weight: 700;
+    }
+    .balance-label {
+      font-size: 12px;
+      color: var(--text2);
+    }
+
+    /* Hidden sections */
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .header { padding: 16px 20px; }
+      .main { padding: 0 20px 40px; }
+      .steps { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">A</div>
+    Antidrain
+  </div>
+  <div class="nav-links">
+    <span class="network-badge">Solana Mainnet</span>
+  </div>
+</div>
+
+<div class="steps">
+  <div class="step active" onclick="showSection('generate')" id="step-generate">
+    <span class="step-num">1</span> Generate
+  </div>
+  <div class="step" onclick="showSection('rescue')" id="step-rescue">
+    <span class="step-num">2</span> Rescue
+  </div>
+  <div class="step" onclick="showSection('withdraw')" id="step-withdraw">
+    <span class="step-num">3</span> Withdraw
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- STEP 1: Generate Sponsor Wallet -->
+  <div class="section active" id="section-generate">
+    <div class="card">
+      <div class="card-title">Generate Sponsor Wallet</div>
+      <div class="card-subtitle">Create a new wallet to sponsor gas fees. Fund it with a small amount of SOL.</div>
+
+      <div id="sponsor-generated" style="display:none;">
+        <label>Sponsor Address</label>
+        <input type="text" id="sponsor-address" readonly onclick="this.select()">
+
+        <label>Sponsor Private Key (save this!)</label>
+        <input type="text" id="sponsor-privkey" readonly onclick="this.select()">
+
+        <div class="balance-display">
+          <div>
+            <div class="balance-label">Sponsor Balance</div>
+            <div class="balance-amount" id="sponsor-balance">0.000 SOL</div>
+          </div>
+          <button class="btn btn-secondary" onclick="refreshSponsorBalance()" style="flex:0;padding:8px 16px;font-size:12px;">Refresh</button>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="generateSponsor()">Generate New Wallet</button>
+        <button class="btn btn-primary" onclick="showSection('rescue')">Next: Rescue</button>
+      </div>
+
+      <div style="margin-top:16px;">
+        <label>Or paste existing sponsor private key</label>
+        <input type="password" id="existing-sponsor" placeholder="Base58 private key...">
+        <button class="btn btn-secondary" onclick="loadExistingSponsor()" style="width:100%;">Load Sponsor Wallet</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: Rescue -->
+  <div class="section" id="section-rescue">
+    <div class="card">
+      <div class="card-title">Solana Sweep</div>
+      <div class="card-subtitle">Enter your compromised wallet details to rescue tokens.</div>
+
+      <label>Compromised Private Key *</label>
+      <input type="password" id="compromised-key" placeholder="Base58 private key of compromised wallet">
+
+      <label>Safe Receiver Address *</label>
+      <input type="text" id="safe-address" placeholder="Address to receive rescued tokens">
+
+      <label>RPC URL</label>
+      <input type="text" id="rpc-url" value="https://api.mainnet-beta.solana.com" placeholder="Solana RPC URL">
+
+      <div class="mode-tabs">
+        <div class="mode-tab active" onclick="setMode('all', this)">All Assets</div>
+        <div class="mode-tab" onclick="setMode('tokens', this)">Tokens Only</div>
+        <div class="mode-tab" onclick="setMode('nfts', this)">NFTs Only</div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="simulateSweep()" id="btn-simulate">Simulate</button>
+        <button class="btn btn-primary" onclick="executeSweep()" id="btn-execute" disabled>Execute (0)</button>
+      </div>
+
+      <div class="token-list" id="token-list"></div>
+
+      <div class="console" id="console">
+        <div class="console-header">
+          <div class="dot dot-red"></div>
+          <div class="dot dot-yellow"></div>
+          <div class="dot dot-green"></div>
+          <span style="color:var(--text2);margin-left:8px;font-size:11px;">console</span>
+        </div>
+        <div id="console-output"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3: Withdraw -->
+  <div class="section" id="section-withdraw">
+    <div class="card">
+      <div class="card-title">Withdraw Sponsor SOL</div>
+      <div class="card-subtitle">Withdraw remaining SOL from the sponsor wallet when you're done.</div>
+
+      <div class="balance-display">
+        <div>
+          <div class="balance-label">Sponsor Balance</div>
+          <div class="balance-amount" id="withdraw-balance">0.000 SOL</div>
+        </div>
+      </div>
+
+      <label>Withdraw To Address</label>
+      <input type="text" id="withdraw-address" placeholder="Address to send remaining SOL">
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="withdrawSponsor()">Withdraw All SOL</button>
+      </div>
+
+      <div class="console" id="withdraw-console" style="display:none;">
+        <div class="console-header">
+          <div class="dot dot-red"></div>
+          <div class="dot dot-yellow"></div>
+          <div class="dot dot-green"></div>
+        </div>
+        <div id="withdraw-output"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script type="module">
+import {
+  Connection,
+  Keypair,
+  PublicKey,
+  Transaction,
+  SystemProgram,
+  ComputeBudgetProgram,
+  LAMPORTS_PER_SOL,
+} from 'https://esm.sh/@solana/web3.js@1.98.0';
+
+import {
+  TOKEN_PROGRAM_ID,
+  getAssociatedTokenAddress,
+  createAssociatedTokenAccountInstruction,
+  createTransferInstruction,
+} from 'https://esm.sh/@solana/spl-token@0.4.9';
+
+import bs58 from 'https://esm.sh/bs58@5.0.0';
+
+// State
+let sponsorKeypair = null;
+let sweepMode = 'all';
+let discoveredTokens = [];
+
+// Expose to global scope for onclick handlers
+window.generateSponsor = generateSponsor;
+window.loadExistingSponsor = loadExistingSponsor;
+window.refreshSponsorBalance = refreshSponsorBalance;
+window.showSection = showSection;
+window.setMode = setMode;
+window.simulateSweep = simulateSweep;
+window.executeSweep = executeSweep;
+window.withdrawSponsor = withdrawSponsor;
+
+function showSection(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById(`section-${name}`).classList.add('active');
+  document.getElementById(`step-${name}`).classList.add('active');
+
+  if (name === 'withdraw' && sponsorKeypair) {
+    refreshWithdrawBalance();
+  }
+}
+
+function setMode(mode, el) {
+  sweepMode = mode;
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function log(msg, level = 'info') {
+  const output = document.getElementById('console-output');
+  const cls = level === 'success' ? 'log-success' : level === 'error' ? 'log-error' : level === 'warn' ? 'log-warn' : 'log-info';
+  const prefix = level === 'success' ? '[ OK ]' : level === 'error' ? '[ERR ]' : level === 'warn' ? '[WARN]' : '[INFO]';
+  output.innerHTML += `<div class="${cls}">${prefix} ${msg}</div>`;
+  const console = document.getElementById('console');
+  console.scrollTop = console.scrollHeight;
+}
+
+function getConnection() {
+  const rpcUrl = document.getElementById('rpc-url').value || 'https://api.mainnet-beta.solana.com';
+  return new Connection(rpcUrl, 'confirmed');
+}
+
+function loadKeypair(base58Key) {
+  const decoded = bs58.decode(base58Key);
+  return Keypair.fromSecretKey(decoded);
+}
+
+function generateSponsor() {
+  sponsorKeypair = Keypair.generate();
+  const address = sponsorKeypair.publicKey.toBase58();
+  const privkey = bs58.encode(sponsorKeypair.secretKey);
+
+  document.getElementById('sponsor-address').value = address;
+  document.getElementById('sponsor-privkey').value = privkey;
+  document.getElementById('sponsor-generated').style.display = 'block';
+
+  refreshSponsorBalance();
+}
+
+function loadExistingSponsor() {
+  const key = document.getElementById('existing-sponsor').value.trim();
+  if (!key) return;
+
+  try {
+    sponsorKeypair = loadKeypair(key);
+    document.getElementById('sponsor-address').value = sponsorKeypair.publicKey.toBase58();
+    document.getElementById('sponsor-privkey').value = key;
+    document.getElementById('sponsor-generated').style.display = 'block';
+    refreshSponsorBalance();
+  } catch (e) {
+    alert('Invalid private key');
+  }
+}
+
+async function refreshSponsorBalance() {
+  if (!sponsorKeypair) return;
+  try {
+    const conn = getConnection();
+    const balance = await conn.getBalance(sponsorKeypair.publicKey);
+    const sol = (balance / LAMPORTS_PER_SOL).toFixed(6);
+    document.getElementById('sponsor-balance').textContent = `${sol} SOL`;
+  } catch (e) {
+    document.getElementById('sponsor-balance').textContent = 'Error';
+  }
+}
+
+async function refreshWithdrawBalance() {
+  if (!sponsorKeypair) return;
+  try {
+    const conn = getConnection();
+    const balance = await conn.getBalance(sponsorKeypair.publicKey);
+    const sol = (balance / LAMPORTS_PER_SOL).toFixed(6);
+    document.getElementById('withdraw-balance').textContent = `${sol} SOL`;
+  } catch (e) {
+    document.getElementById('withdraw-balance').textContent = 'Error';
+  }
+}
+
+async function simulateSweep() {
+  const compromisedKeyStr = document.getElementById('compromised-key').value.trim();
+  const safeAddr = document.getElementById('safe-address').value.trim();
+
+  if (!compromisedKeyStr || !safeAddr) {
+    alert('Fill in compromised private key and safe receiver address');
+    return;
+  }
+  if (!sponsorKeypair) {
+    alert('Generate or load a sponsor wallet first (Step 1)');
+    return;
+  }
+
+  const btn = document.getElementById('btn-simulate');
+  btn.textContent = 'Scanning...';
+  btn.disabled = true;
+
+  document.getElementById('console-output').innerHTML = '';
+  document.getElementById('token-list').innerHTML = '';
+  discoveredTokens = [];
+
+  try {
+    const compromised = loadKeypair(compromisedKeyStr);
+    const conn = getConnection();
+
+    log('Operation: Solana Sweep');
+    log('Network: Solana Mainnet');
+    log(`Starting Sweep Mode (${sweepMode})...`);
+    log('Discovering token accounts...');
+
+    const tokenAccounts = await conn.getParsedTokenAccountsByOwner(
+      compromised.publicKey,
+      { programId: TOKEN_PROGRAM_ID }
+    );
+
+    let tokenListHtml = '';
+    let sweepable = 0;
+
+    for (const { pubkey, account } of tokenAccounts.value) {
+      const info = account.data.parsed.info;
+      const amount = BigInt(info.tokenAmount.amount);
+      if (amount === 0n) continue;
+
+      const mint = info.mint;
+      const uiAmount = info.tokenAmount.uiAmountString;
+      const decimals = info.tokenAmount.decimals;
+      const isFrozen = info.state === 'frozen';
+      const isNft = decimals === 0 && amount === 1n;
+
+      // Filter by mode
+      if (sweepMode === 'tokens' && isNft) continue;
+      if (sweepMode === 'nfts' && !isNft) continue;
+
+      const statusClass = isFrozen ? 'status-frozen' : 'status-ready';
+      const statusText = isFrozen ? 'FROZEN' : 'READY';
+
+      tokenListHtml += `
+        <div class="token-item">
+          <div>
+            <div class="token-amount">${uiAmount} ${isNft ? 'NFT' : 'tokens'}</div>
+            <div class="token-mint">${mint}</div>
+          </div>
+          <span class="token-status ${statusClass}">${statusText}</span>
+        </div>
+      `;
+
+      if (!isFrozen) {
+        sweepable++;
+        discoveredTokens.push({
+          pubkey,
+          mint: new PublicKey(mint),
+          amount,
+          uiAmount,
+          decimals,
+        });
+      }
+
+      const logLevel = isFrozen ? 'warn' : 'info';
+      const logMsg = isFrozen
+        ? `FROZEN: ${uiAmount} of ${mint} (skipping)`
+        : `Found: ${uiAmount} of ${mint}`;
+      log(logMsg, logLevel);
+    }
+
+    document.getElementById('token-list').innerHTML = tokenListHtml;
+
+    const execBtn = document.getElementById('btn-execute');
+    execBtn.textContent = `Execute (${sweepable})`;
+    execBtn.disabled = sweepable === 0;
+
+    const solBal = await conn.getBalance(compromised.publicKey);
+    log(`SOL balance: ${(solBal / LAMPORTS_PER_SOL).toFixed(6)} SOL`);
+    log(`Found ${sweepable} sweepable token(s), ${tokenAccounts.value.length - sweepable} skipped`, sweepable > 0 ? 'success' : 'info');
+
+  } catch (e) {
+    log(`Error: ${e.message}`, 'error');
+  } finally {
+    btn.textContent = 'Simulate';
+    btn.disabled = false;
+  }
+}
+
+async function executeSweep() {
+  if (discoveredTokens.length === 0) return;
+
+  const compromisedKeyStr = document.getElementById('compromised-key').value.trim();
+  const safeAddr = document.getElementById('safe-address').value.trim();
+
+  const btn = document.getElementById('btn-execute');
+  btn.disabled = true;
+  btn.textContent = 'Sweeping...';
+
+  try {
+    const compromised = loadKeypair(compromisedKeyStr);
+    const safeWallet = new PublicKey(safeAddr);
+    const conn = getConnection();
+
+    log('Starting sweep execution...', 'info');
+
+    let succeeded = 0;
+    let failed = 0;
+
+    for (const token of discoveredTokens) {
+      try {
+        const destAta = await getAssociatedTokenAddress(token.mint, safeWallet);
+        const tx = new Transaction();
+
+        // Priority fee
+        tx.add(ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 500000 }));
+        tx.add(ComputeBudgetProgram.setComputeUnitLimit({ units: 200000 }));
+
+        // Create ATA if needed
+        const destInfo = await conn.getAccountInfo(destAta);
+        if (!destInfo) {
+          tx.add(createAssociatedTokenAccountInstruction(
+            sponsorKeypair.publicKey,
+            destAta,
+            safeWallet,
+            token.mint
+          ));
+        }
+
+        // Transfer
+        tx.add(createTransferInstruction(
+          token.pubkey,
+          destAta,
+          compromised.publicKey,
+          token.amount
+        ));
+
+        tx.feePayer = sponsorKeypair.publicKey;
+        const { blockhash, lastValidBlockHeight } = await conn.getLatestBlockhash('confirmed');
+        tx.recentBlockhash = blockhash;
+        tx.sign(sponsorKeypair, compromised);
+
+        const sig = await conn.sendRawTransaction(tx.serialize(), {
+          skipPreflight: false,
+          preflightCommitment: 'confirmed',
+        });
+
+        await conn.confirmTransaction({ signature: sig, blockhash, lastValidBlockHeight }, 'confirmed');
+
+        log(`Swept ${token.uiAmount} of ${token.mint.toBase58()} -> TX: ${sig}`, 'success');
+        succeeded++;
+
+        // Update UI
+        const items = document.querySelectorAll('.token-item');
+        items.forEach(item => {
+          if (item.querySelector('.token-mint').textContent === token.mint.toBase58()) {
+            const status = item.querySelector('.token-status');
+            status.className = 'token-status status-swept';
+            status.textContent = 'SWEPT';
+          }
+        });
+
+      } catch (e) {
+        log(`Failed to sweep ${token.mint.toBase58()}: ${e.message}`, 'error');
+        failed++;
+      }
+
+      // Delay between sweeps
+      await new Promise(r => setTimeout(r, 500));
+    }
+
+    log(`Sweep complete! ${succeeded} succeeded, ${failed} failed`, 'success');
+    log(`Done - ${succeeded} succeeded`, 'success');
+
+    btn.textContent = `Execute (0)`;
+    discoveredTokens = [];
+
+  } catch (e) {
+    log(`Sweep error: ${e.message}`, 'error');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function withdrawSponsor() {
+  if (!sponsorKeypair) {
+    alert('No sponsor wallet loaded');
+    return;
+  }
+
+  const withdrawAddr = document.getElementById('withdraw-address').value.trim();
+  if (!withdrawAddr) {
+    alert('Enter a withdrawal address');
+    return;
+  }
+
+  const consoleEl = document.getElementById('withdraw-console');
+  const output = document.getElementById('withdraw-output');
+  consoleEl.style.display = 'block';
+  output.innerHTML = '';
+
+  function wlog(msg, level = 'info') {
+    const cls = level === 'success' ? 'log-success' : level === 'error' ? 'log-error' : 'log-info';
+    output.innerHTML += `<div class="${cls}">${msg}</div>`;
+  }
+
+  try {
+    const conn = getConnection();
+    const balance = await conn.getBalance(sponsorKeypair.publicKey);
+
+    if (balance === 0) {
+      wlog('Sponsor wallet has 0 SOL', 'error');
+      return;
+    }
+
+    // Leave enough for rent exemption
+    const fee = 5000 + 500; // base fee + priority
+    const sendAmount = balance - fee;
+
+    if (sendAmount <= 0) {
+      wlog('Balance too low to withdraw (need to cover tx fee)', 'error');
+      return;
+    }
+
+    wlog(`Withdrawing ${(sendAmount / LAMPORTS_PER_SOL).toFixed(6)} SOL...`);
+
+    const tx = new Transaction().add(
+      SystemProgram.transfer({
+        fromPubkey: sponsorKeypair.publicKey,
+        toPubkey: new PublicKey(withdrawAddr),
+        lamports: sendAmount,
+      })
+    );
+
+    tx.feePayer = sponsorKeypair.publicKey;
+    const { blockhash, lastValidBlockHeight } = await conn.getLatestBlockhash('confirmed');
+    tx.recentBlockhash = blockhash;
+    tx.sign(sponsorKeypair);
+
+    const sig = await conn.sendRawTransaction(tx.serialize());
+    await conn.confirmTransaction({ signature: sig, blockhash, lastValidBlockHeight }, 'confirmed');
+
+    wlog(`Withdrawal complete! TX: ${sig}`, 'success');
+    refreshWithdrawBalance();
+
+  } catch (e) {
+    wlog(`Error: ${e.message}`, 'error');
+  }
+}
+</script>
+
+</body>
+</html>

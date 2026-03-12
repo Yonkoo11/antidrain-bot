@@ -3,6 +3,7 @@ import { config } from "./config";
 import { logger } from "./logger";
 import { startMonitor, stopMonitor } from "./monitor";
 import { setConnections } from "./sweeper";
+import { setClaimerConnections, watchClaimsFile } from "./claimer";
 
 async function main(): Promise<void> {
   logger.info("=== Antidrain Bot Starting ===");
@@ -37,8 +38,9 @@ async function main(): Promise<void> {
     }
   }
 
-  // Pass both connections to sweeper
+  // Pass both connections to sweeper and claimer
   setConnections(connection, fallbackConnection);
+  setClaimerConnections(connection, fallbackConnection);
 
   // Check sponsor balance
   const sponsorBalance = await connection.getBalance(
@@ -53,8 +55,9 @@ async function main(): Promise<void> {
     );
   }
 
-  // Start monitoring
+  // Start monitoring and claim watcher
   startMonitor(connection);
+  watchClaimsFile(connection);
 
   // Graceful shutdown
   const shutdown = () => {
